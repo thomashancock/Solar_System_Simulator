@@ -78,12 +78,11 @@ class OrbitalBody():
     Body
     """
 
-    def __init__(self, surface, name, color, initPos, initVel):
+    def __init__(self, name, color, initPos, initVel):
         """
         Body Constructor
         """
 
-        self.surface = surface
         self.name = name
 
         # Constants
@@ -102,9 +101,9 @@ class OrbitalBody():
     def getName():
         return self.name
 
-    def draw(self):
+    def draw(self, surface):
         xPos, yPos = coorToPixel(self.pos[0], self.pos[1])
-        pygame.draw.circle(self.surface,self.color,[xPos, yPos],self.radius,0)
+        pygame.draw.circle(surface, self.color, [xPos, yPos], self.radius, 0)
 
     def update(self, dT):
         # Update position using Euler Method
@@ -119,49 +118,73 @@ class OrbitalBody():
             self.pos[coor] = self.pos[coor] + self.vel[coor] * dT
 
 
+class World:
+    '''
+    World class
+    Manages and runs the simulation
+    '''
+    def __init__(self, width, height):
+        self.surface = pygame.display.set_mode((width, height))
+
+        self.dT = 24*(60.0**2) # 1 frame = 1 day
+        self.elapsedTime = 0.0
+
+        self.entities = []
+
+
+    def addEntity(self, entity):
+        '''
+        Add an entity for the world to track
+        '''
+        self.entities.append(entity)
+
+
+    def run(self):
+        '''
+        Runs the simulation
+        '''
+        while True:
+            for event in pygame.event.get():
+                # Detect Quit Action
+                if event.type == pygame.locals.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            # Update objects
+            self.surface.fill(BLACK)
+
+            for entity in self.entities:
+                entity.update(self.dT)
+                entity.draw(self.surface)
+
+            # Print elapsed time
+            self.elapsedTime += self.dT
+            textsurface = fontComicSans.render('{:0.2f} earth years'.format(self.elapsedTime/(self.dT*365.25)), False, WHITE)
+            self.surface.blit(textsurface,(0,0))
+
+            # Update display
+            pygame.display.flip()
+
+            pygame.display.set_caption("Simulation FPS: {0}".format(int(clock.get_fps())))
+
+            clock.tick(60)
+
+
 def main():
+    '''
+    Main function
+    '''
 
-    surface = pygame.display.set_mode((surfaceWidth, surfaceHeight))
+    # Define world object
+    world = World(surfaceWidth, surfaceHeight)
 
-    pygame.display.set_caption("SS Solar System Sim. FPS: " + str(clock.get_fps()))
-
-    # Declare game objects
-    entities = []
-
+    # Popuate world with entities
     for key, val in planetDict.items():
-        planet = OrbitalBody(surface, key, val[0], [0.0, val[2]], [val[1], 0.0])
-        entities.append(planet)
+        planet = OrbitalBody(key, val[0], [0.0, val[2]], [val[1], 0.0])
+        world.addEntity(planet)
 
-    dT = 24*(60.0**2) # 1 frame = 1 day
-
-    elapsedTime = 0
-
-    # Game Loop
-    while True:
-        for event in pygame.event.get():
-            # Detect Quit Action
-            if event.type == pygame.locals.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        # Update objects
-        surface.fill(BLACK)
-
-        for entity in entities:
-            entity.update(dT)
-            entity.draw()
-
-        # Print elapsed time
-        elapsedTime += dT
-        textsurface = fontComicSans.render('{:0.2f} earth years'.format(elapsedTime/(dT*365.25)), False, WHITE)
-        surface.blit(textsurface,(0,0))
-
-        # Update display
-        pygame.display.flip()
-
-        pygame.display.set_caption("Brick Breaker, FPS: {0}".format(int(clock.get_fps())))
-
-        clock.tick(60)
+    # Run world
+    world.run()
 
 
 if __name__ == "__main__":
