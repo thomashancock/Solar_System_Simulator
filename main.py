@@ -53,10 +53,16 @@ planetDict = {
     'neptune': [BLUE, 5.43, 30.06*convertAU2km]
 }
 
-maxOrbitRad = 0.0
-for _, val in planetDict.items():
-    maxOrbitRad = val[2] if val[2] > maxOrbitRad else maxOrbitRad
-assert(maxOrbitRad > 0.0)
+
+def getMaxOrbitRadius(planetDict):
+    maxOrbitRad = 0.0
+    for _, val in planetDict.items():
+        maxOrbitRad = val[2] if val[2] > maxOrbitRad else maxOrbitRad
+    assert(maxOrbitRad > 0.0)
+    return maxOrbitRad
+
+maxOrbitRad = getMaxOrbitRadius(planetDict)
+
 
 def coorToPixel(xCoor, yCoor):
     scaleFactor = surfaceHeight/(maxOrbitRad*2.2)
