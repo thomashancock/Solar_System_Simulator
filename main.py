@@ -1,18 +1,30 @@
 import sys
 import random
 import math
+
+# Setup logging
+import logging
+
+if __debug__:
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.DEBUG,
+        datefmt='%Y-%m-%d %H:%M:%S')
+else:
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S')
+
+# Setup pygame
 import pygame
 import pygame.locals
 pygame.init()
 pygame.font.init()
 
-
 fontComicSans = pygame.font.SysFont('Comic Sans MS', 30)
-
-
 clock = pygame.time.Clock()
 # clock.set_fps_limit(60)
-
 
 # Define colors
 WHITE = (255,255,255)
@@ -37,11 +49,11 @@ planetDict = {
     'mercury': [SADDLEBROWN, 47.87, 0.39*convertAU2km],
     'venus': [ROSYBROWN, 35.02, 0.723*convertAU2km],
     'earth': [GREEN, 29.78, 1.0*convertAU2km],
-    'mars': [RED, 24.077, 1.524*convertAU2km]
-    # 'jupiter': [ORANGE, 13.07, 5.203*convertAU2km],
-    # 'saturn': [WHITE, 9.69, 9.539*convertAU2km],
-    # 'uranus': [CYAN, 6.81, 19.18*convertAU2km],
-    # 'neptune': [BLUE, 5.43, 30.06*convertAU2km]
+    'mars': [RED, 24.077, 1.524*convertAU2km],
+    'jupiter': [ORANGE, 13.07, 5.203*convertAU2km],
+    'saturn': [WHITE, 9.69, 9.539*convertAU2km],
+    'uranus': [CYAN, 6.81, 19.18*convertAU2km],
+    'neptune': [BLUE, 5.43, 30.06*convertAU2km]
 }
 
 maxOrbitRad = 0.0
@@ -63,12 +75,12 @@ def coorToPixel(xCoor, yCoor):
 
 class OrbitalBody():
     """
-    Ball
+    Body
     """
 
     def __init__(self, surface, name, color, initPos, initVel):
         """
-        Ball Constructor
+        Body Constructor
         """
 
         self.surface = surface
@@ -77,28 +89,21 @@ class OrbitalBody():
         # Constants
         self.G = 6.674 * 1E-20 # km^3 /kg /s^2
         self.mass = 1.989 * 1E30 # kg # Solar Mass
-        # self.mass = 5.972 * 1E24 # kg
-        # velEarth = 30 # km/s
-        # self.orbitalRadius = 149.60 * 1E6 # km
-        # self.dT = 24*(60.0**2) # 1 frame = 1 day
 
+        # Draw options
         self.radius = 5
-        # self.pos = [0.0, 149.60 * 1E6]
-        # self.vel = [30, 0.0]
         self.pos = [x for x in initPos]
         self.vel = [x for x in initVel]
         self.acc = [0.0, 0.0]
         self.color = color
 
-        print("Created body {} with colour {}".format(name, color))
+        logging.info("Created body {} with colour {}".format(name, color))
 
     def getName():
         return self.name
 
     def draw(self):
-        # print("drawing {}".format(self.name))
         xPos, yPos = coorToPixel(self.pos[0], self.pos[1])
-        # print("{}, {}".format(xPos, yPos))
         pygame.draw.circle(self.surface,self.color,[xPos, yPos],self.radius,0)
 
     def update(self, dT):
@@ -138,10 +143,6 @@ def main():
             if event.type == pygame.locals.QUIT:
                 pygame.quit()
                 sys.exit()
-
-            # if event.type == pygame.locals.MOUSEBUTTONDOWN:
-            #     for entity in entities:
-            #         entity.nudge()
 
         # Update objects
         surface.fill(BLACK)
