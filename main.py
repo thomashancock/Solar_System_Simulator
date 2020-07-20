@@ -23,14 +23,11 @@ pygame.init()
 pygame.font.init()
 
 fontComicSans = pygame.font.SysFont('Comic Sans MS', 30)
-clock = pygame.time.Clock()
-# clock.set_fps_limit(60)
 
 # Define colors
 WHITE = (255,255,255)
 GREY = (128,128,128)
 BLACK = (0,0,0)
-
 RED = (255,0,0)
 ORANGE = (255, 165, 0)
 GREEN = (0,255,0)
@@ -39,7 +36,7 @@ SADDLEBROWN = (139, 69, 19)
 ROSYBROWN = (188, 143, 143)
 CYAN = (0, 255, 255)
 
-convertAU2km = 149.60 * 1E6
+convertAU2km = 149.6E6
 
 surfaceWidth = 720
 surfaceHeight = 720
@@ -73,7 +70,7 @@ def coorToPixel(xCoor, yCoor):
     return xPos, yPos
 
 
-class OrbitalBody():
+class OrbitalBody:
     """
     Body
     """
@@ -126,6 +123,7 @@ class World:
     def __init__(self, width, height):
         self.surface = pygame.display.set_mode((width, height))
 
+        self.clock = pygame.time.Clock()
         self.dT = 24*(60.0**2) # 1 frame = 1 day
         self.elapsedTime = 0.0
 
@@ -165,9 +163,9 @@ class World:
             # Update display
             pygame.display.flip()
 
-            pygame.display.set_caption("Simulation FPS: {0}".format(int(clock.get_fps())))
+            pygame.display.set_caption("Simulation FPS: {0}".format(int(self.clock.get_fps())))
 
-            clock.tick(60)
+            self.clock.tick(60)
 
 
 def main():
